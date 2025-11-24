@@ -1,0 +1,19 @@
+# fly.toml app configuration file generated for flyingtail on 2025-11-23T21:31:38-06:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'flyingtail'
+primary_region = 'dfw'
+
+[build]
+  image = 'tailscale/tailscale:latest'
+
+[env]
+  # Required for Tailscale containerboot to find tailscaled executable
+  # See: https://github.com/tailscale/tailscale/issues/11195
+  PATH = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  TS_EXTRA_ARGS = '--advertise-exit-node'
+
+[[vm]]
+  size = 'shared-cpu-1x'
