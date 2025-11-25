@@ -39,7 +39,7 @@ Set the `TS_AUTHKEY` environment variable with your Tailscale auth key, then run
 
 ```bash
 flyctl apps create flyingtail
-flyctl secrets set TS_AUTHKEY=$TS_AUTHKEY
+flyctl secrets set TS_AUTHKEY=$TS_AUTHKEY --stage
 flyctl deploy
 ```
 
