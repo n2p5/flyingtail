@@ -4,46 +4,44 @@ Tailscale exit node running on Fly.io in Dallas.
 
 ## Overview
 
-This deployment uses the official `tailscale/tailscale` Docker image to run a Tailscale exit node. The configuration is minimal - no custom Dockerfile needed, everything is configured through environment variables in `fly.toml`.
+This deployment uses the official `tailscale/tailscale` Docker image to run a Tailscale exit node on fly.io in Dallas. The configuration is minimal - no custom Dockerfile needed, everything is configured through environment variables in `fly.toml`.
 
-## Setup
+## Prerequisites
 
-1. Install flyctl and authenticate:
+### Tailscale ACL Configuration
 
-   ```bash
-   brew install flyctl
-   flyctl auth login
-   ```
+Add this to your ACL policy at <https://login.tailscale.com/admin/acls>:
 
-2. Create the app:
+```json
+{
+  "tagOwners": {
+    "tag:exit-node": ["autogroup:admin"]
+  },
+  "autoApprovers": {
+    "exitNode": ["tag:exit-node"]
+  }
+}
+```
 
-   ```bash
-   flyctl apps create flyingtail
-   ```
+This enables auto-approval so the exit node activates immediately on deploy.
 
-3. Generate a Tailscale auth key:
-   - Go to <https://login.tailscale.com/admin/settings/keys>
-   - Generate an auth key with these settings:
-     - Reusable: Yes (so the container can restart)
-     - Ephemeral: Yes (node disappears when offline)
-     - Tags: Add appropriate tags if needed
+### Tailscale Auth Key
 
-4. Set the auth key as a secret:
+Generate a key at <https://login.tailscale.com/admin/settings/keys> with:
 
-   ```bash
-   flyctl secrets set TS_AUTHKEY=tskey-auth-xxxxxxxxxxxxx
-   ```
+- **Reusable**: Yes (allows container restarts)
+- **Ephemeral**: Yes (node disappears when offline)
+- **Tags**: `tag:exit-node`
 
-5. Deploy:
+## Deploy
 
-   ```bash
-   flyctl deploy
-   ```
+Set the `TS_AUTHKEY` environment variable with your Tailscale auth key, then run:
 
-6. Enable the exit node in Tailscale admin:
-   - Go to <https://login.tailscale.com/admin/machines>
-   - Find your `flyingtail` node
-   - Enable "Use as exit node"
+```bash
+flyctl apps create flyingtail
+flyctl secrets set TS_AUTHKEY=$TS_AUTHKEY
+flyctl deploy
+```
 
 ## Usage
 
@@ -57,9 +55,15 @@ Or use the Tailscale GUI to select it as your exit node.
 
 ## Monitoring
 
-Check app status:
-
 ```bash
 flyctl status
 flyctl logs
 ```
+
+## Shutdown
+
+```bash
+flyctl scale count 0
+```
+
+To start again: `flyctl scale count 1` or `flyctl deploy`.

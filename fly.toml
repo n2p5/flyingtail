@@ -7,13 +7,14 @@ app = 'flyingtail'
 primary_region = 'dfw'
 
 [build]
-  image = 'tailscale/tailscale:latest'
+image = 'tailscale/tailscale:stable'
 
 [env]
-  # Required for Tailscale containerboot to find tailscaled executable
-  # See: https://github.com/tailscale/tailscale/issues/11195
-  PATH = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-  TS_EXTRA_ARGS = '--advertise-exit-node'
+# Required for Tailscale containerboot to find tailscaled executable
+# See: https://github.com/tailscale/tailscale/issues/11195
+PATH = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+TS_EXTRA_ARGS = '--advertise-exit-node --advertise-tags=tag:exit-node'
 
 [[vm]]
-  size = 'shared-cpu-1x'
+size = 'shared-cpu-1x'
+memory = 512
